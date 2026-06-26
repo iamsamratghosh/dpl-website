@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Premier League 2026 — India's Cricket Analytics Hackathon</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #1A3557; --navy-dark: #0F2035; --navy-light: #254a78;
+  --gold: #C9A84C; --gold-light: #e2c478; --gold-pale: #fdf5e0;
+  --off-white: #F7F5F0; --white: #ffffff;
+  --text: #1a1a1a; --text-muted: #5a6270; --border: #e0ddd5;
+  --card-radius: 12px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+
+/* ── PAGE LOAD OVERLAY ── */
+#loader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--navy-dark);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+#loader.hidden { opacity: 0; visibility: hidden; }
+.loader-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 64px; font-weight: 900;
+  color: var(--gold);
+  letter-spacing: -2px;
+  animation: loaderPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  opacity: 0; transform: scale(0.6);
+}
+@keyframes loaderPop { to { opacity: 1; transform: scale(1); } }
+.loader-sub {
+  color: rgba(255,255,255,0.4); font-size: 11px; letter-spacing: 3px;
+  text-transform: uppercase; margin-top: 8px;
+  animation: loaderFade 0.5s 0.3s ease forwards; opacity: 0;
+}
+@keyframes loaderFade { to { opacity: 1; } }
+.loader-bar-wrap { width: 160px; height: 2px; background: rgba(255,255,255,0.1); margin-top: 2.5rem; border-radius: 2px; overflow: hidden; }
+.loader-bar { height: 100%; width: 0; background: var(--gold); border-radius: 2px; animation: loadBar 1.2s 0.2s ease forwards; }
+@keyframes loadBar { to { width: 100%; } }
+
+/* ── SCROLL REVEAL ── */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--navy-dark); border-bottom: 3px solid var(--gold);
+  padding: 0 clamp(1rem, 4vw, 3rem);
+  display: flex; align-items: center; justify-content: space-between; height: 64px;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-badge {
+  background: var(--gold); color: var(--navy-dark);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900;
+  padding: 4px 10px; border-radius: 4px;
+}
+.nav-sub { color: rgba(255,255,255,0.6); font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+.nav-links { display: flex; gap: clamp(0.75rem, 2vw, 1.75rem); align-items: center; }
+.nav-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 13px; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: var(--gold); }
+.nav-cta { background: var(--gold); color: var(--navy-dark) !important; padding: 8px 20px; border-radius: 6px; font-weight: 700 !important; transition: background 0.2s !important; }
+.nav-cta:hover { background: var(--gold-light) !important; }
+.nav-menu-toggle { display: none; background: none; border: none; cursor: pointer; color: white; font-size: 24px; line-height: 1; }
+
+/* ── HERO ── */
+.hero {
+  background: var(--navy-dark); position: relative; overflow: hidden;
+  padding: clamp(3.5rem, 8vw, 7rem) clamp(1.5rem, 6vw, 5rem);
+  min-height: 600px; display: flex; align-items: center;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(201,168,76,0.025) 40px,rgba(201,168,76,0.025) 41px);
+}
+.hero-orb-1 { position: absolute; right: -80px; top: 50%; transform: translateY(-50%); width: 520px; height: 520px; border-radius: 50%; border: 90px solid rgba(201,168,76,0.05); pointer-events: none; }
+.hero-orb-2 { position: absolute; right: 80px; top: 50%; transform: translateY(-50%); width: 340px; height: 340px; border-radius: 50%; border: 45px solid rgba(201,168,76,0.035); pointer-events: none; }
+.hero-orb-3 { position: absolute; right: 200px; top: 50%; transform: translateY(-50%); width: 180px; height: 180px; border-radius: 50%; border: 25px solid rgba(201,168,76,0.025); pointer-events: none; }
+.hero-content { position: relative; z-index: 1; max-width: 740px; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 100px; margin-bottom: 1.5rem;
+  animation: heroFadeIn 0.7s 1.5s ease both;
+}
+.hero-eyebrow::before { content: '●'; font-size: 7px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(46px, 8.5vw, 88px); font-weight: 900; line-height: 0.93;
+  color: var(--white); text-transform: uppercase; letter-spacing: -1px;
+  margin-bottom: 1.25rem;
+  animation: heroFadeIn 0.7s 1.7s ease both;
+}
+.hero h1 span { color: var(--gold); }
+@keyframes heroFadeIn { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+.hero-tagline { color: rgba(255,255,255,0.6); font-size: clamp(15px, 2vw, 17px); max-width: 520px; margin-bottom: 2rem; line-height: 1.7; animation: heroFadeIn 0.7s 1.9s ease both; }
+.hero-stats { display: flex; flex-wrap: wrap; gap: 2.25rem; margin-bottom: 2.5rem; animation: heroFadeIn 0.7s 2.1s ease both; }
+.hero-stat-num { font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 900; color: var(--gold); line-height: 1; }
+.hero-stat-label { font-size: 11px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: heroFadeIn 0.7s 2.3s ease both; }
+.btn-primary { background: var(--gold); color: var(--navy-dark); padding: 14px 30px; border-radius: 8px; font-weight: 700; font-size: 15px; text-decoration: none; transition: background 0.2s, transform 0.15s; display: inline-block; }
+.btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+.btn-outline { background: transparent; color: var(--white); padding: 14px 30px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.25); font-weight: 600; font-size: 15px; text-decoration: none; transition: border-color 0.2s, color 0.2s; display: inline-block; }
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── TICKER ── */
+.ticker { background: var(--gold); color: var(--navy-dark); overflow: hidden; padding: 10px 0; white-space: nowrap; }
+.ticker-inner { display: inline-block; animation: ticker 35s linear infinite; }
+.ticker-inner span { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 0 2.5rem; }
+.ticker-inner span::before { content: '◆  '; }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ── SECTIONS ── */
+section { padding: clamp(3rem, 6vw, 5.5rem) clamp(1.5rem, 6vw, 5rem); }
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+h2 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(28px, 4vw, 46px); font-weight: 800; color: var(--navy); line-height: 1.05; text-transform: uppercase; margin-bottom: 1rem; }
+.section-intro { color: var(--text-muted); font-size: 16px; max-width: 620px; line-height: 1.75; margin-bottom: 2.5rem; }
+
+/* ── ABOUT ── */
+.about-strip { background: var(--off-white); }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; max-width: 1100px; margin: 0 auto; }
+.about-text p { color: var(--text-muted); font-size: 15px; line-height: 1.85; margin-bottom: 1rem; }
+.about-callout { background: var(--navy-dark); color: var(--white); border-radius: var(--card-radius); padding: 2.25rem; position: relative; overflow: hidden; }
+.about-callout::before { content: 'NFL BIG DATA BOWL'; position: absolute; top: -8px; left: -4px; font-family: 'Barlow Condensed', sans-serif; font-size: 88px; font-weight: 900; color: rgba(255,255,255,0.025); line-height: 1; white-space: nowrap; pointer-events: none; }
+.about-callout-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 0.75rem; }
+.about-callout p { font-size: 14px; line-height: 1.75; color: rgba(255,255,255,0.65); }
+.inspiration-line { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: rgba(255,255,255,0.45); }
+.inspiration-line strong { color: var(--gold); }
+
+/* ── STATS ROW ── */
+.stats-row { background: var(--navy); display: flex; justify-content: center; flex-wrap: wrap; }
+.stat-block { padding: 2.5rem 3rem; text-align: center; border-right: 1px solid rgba(255,255,255,0.07); flex: 1; min-width: 150px; }
+.stat-block:last-child { border-right: none; }
+.stat-block .num { font-family: 'Barlow Condensed', sans-serif; font-size: 50px; font-weight: 900; color: var(--gold); line-height: 1; }
+.stat-block .lbl { font-size: 11px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 5px; }
+
+/* ── FLIP CARDS (TRACKS) ── */
+.tracks-section { background: var(--white); }
+.tracks-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
+.flip-card { height: 220px; perspective: 1000px; cursor: pointer; }
+.flip-card:focus { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: var(--card-radius); }
+.flip-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); }
+.flip-card:hover .flip-inner, .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+.flip-front, .flip-back { position: absolute; inset: 0; border-radius: var(--card-radius); backface-visibility: hidden; -webkit-backface-visibility: hidden; padding: 1.6rem; }
+.flip-front { background: var(--white); border: 1.5px solid var(--border); display: flex; flex-direction: column; }
+.flip-back { background: var(--navy); border: 1.5px solid var(--navy); transform: rotateY(180deg); display: flex; flex-direction: column; justify-content: space-between; }
+.track-num { display: inline-block; background: var(--navy); color: var(--gold); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; margin-bottom: 0.75rem; width: fit-content; }
+.flip-front h3 { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 0.5rem; line-height: 1.3; }
+.flip-front .flip-front-desc { font-size: 13px; color: var(--text-muted); line-height: 1.55; flex: 1; }
+.flip-front .flip-hint { font-size: 10px; color: rgba(26,53,87,0.3); text-transform: uppercase; letter-spacing: 1px; margin-top: auto; padding-top: 0.5rem; }
+.flip-back-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 0.5rem; }
+.flip-back h3 { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 0.75rem; line-height: 1.3; }
+.flip-back ul { list-style: none; flex: 1; }
+.flip-back ul li { font-size: 12px; color: rgba(255,255,255,0.6); padding: 3px 0; display: flex; gap: 7px; line-height: 1.5; }
+.flip-back ul li::before { content: '→'; color: var(--gold); flex-shrink: 0; }
+.flip-tap-hint { font-size: 10px; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── FORMAT ── */
+.format-section { background: var(--off-white); }
+.format-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; }
+.format-card { background: var(--white); border-radius: var(--card-radius); padding: 1.5rem; border: 1px solid var(--border); transition: border-color 0.2s, transform 0.2s; }
+.format-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.format-icon { width: 40px; height: 40px; background: var(--gold-pale); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 0.75rem; }
+.format-card h3 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; }
+.format-card p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+/* ── PRIZES ── */
+.prizes-section { background: var(--navy-dark); }
+.prizes-section h2 { color: var(--white); }
+.prizes-section .section-intro { color: rgba(255,255,255,0.55); }
+.prizes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 780px; }
+.prize-category { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--card-radius); padding: 1.75rem; }
+.prize-category-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+.prize-row { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.prize-row:last-of-type { border-bottom: none; }
+.prize-rank { display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.7); }
+.prize-amount { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--gold); }
+.prize-total { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(201,168,76,0.2); display: flex; justify-content: space-between; align-items: center; }
+.prize-total span:first-child { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,0.35); text-transform: uppercase; }
+.prize-total span:last-child { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 900; color: var(--gold); }
+
+/* ── TIMELINE ── */
+.timeline-section { background: var(--white); }
+.timeline { max-width: 780px; }
+.timeline-item { display: flex; gap: 1.5rem; padding-bottom: 2.25rem; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-left { display: flex; flex-direction: column; align-items: center; min-width: 40px; }
+.timeline-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--gold); border: 3px solid var(--white); box-shadow: 0 0 0 2px var(--gold); flex-shrink: 0; }
+.timeline-line { width: 2px; flex: 1; background: var(--border); margin-top: 4px; }
+.timeline-item:last-child .timeline-line { display: none; }
+.timeline-date { font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+.timeline-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+.timeline-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+/* ── JUDGING ── */
+.criteria-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+.criterion { padding: 1.25rem 1.5rem; border-left: 3px solid var(--gold); background: var(--off-white); border-radius: 0 8px 8px 0; transition: background 0.2s; }
+.criterion:hover { background: #f0ede5; }
+.criterion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+.criterion h3 { font-size: 14px; font-weight: 700; color: var(--navy); }
+.criterion-weight { background: var(--navy); color: var(--gold); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap; margin-left: 8px; }
+.criterion p { font-size: 12px; color: var(--text-muted); line-height: 1.65; }
+
+/* ── CAROUSEL (FAQ) ── */
+.faq-section { background: var(--navy); }
+.faq-section h2 { color: var(--white); }
+.faq-section .section-label { color: var(--gold); }
+.carousel-wrap { position: relative; overflow: hidden; }
+.carousel-track { display: flex; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); will-change: transform; }
+.faq-slide { flex: 0 0 100%; max-width: 100%; }
+.faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.faq-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--card-radius); padding: 1.5rem; }
+.faq-q { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; line-height: 1.4; }
+.faq-a { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.65; }
+.carousel-controls { display: flex; align-items: center; gap: 1rem; margin-top: 1.75rem; }
+.carousel-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+.carousel-btn:hover { background: var(--gold); color: var(--navy-dark); border-color: var(--gold); }
+.carousel-dots { display: flex; gap: 6px; }
+.carousel-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: background 0.2s, transform 0.2s; padding: 0; }
+.carousel-dot.active { background: var(--gold); transform: scale(1.2); }
+
+/* ── FEES ── */
+.fees-section { background: var(--off-white); }
+.fees-table { width: 100%; border-collapse: collapse; max-width: 720px; font-size: 14px; }
+.fees-table th { background: var(--navy); color: var(--gold); padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.fees-table td { padding: 13px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.fees-table tr:last-child td { border-bottom: none; }
+.fees-table tr:nth-child(even) td { background: rgba(26,53,87,0.025); }
+.fees-amount { font-weight: 700; color: var(--navy); white-space: nowrap; }
+
+/* ── CTA ── */
+.cta-section { background: var(--gold-pale); border-top: 4px solid var(--gold); text-align: center; padding: clamp(3.5rem, 7vw, 6rem) 2rem; }
+.cta-section h2 { color: var(--navy); font-size: clamp(28px, 4vw, 52px); }
+.cta-section p { color: var(--text-muted); font-size: 16px; margin: 1rem auto 2rem; max-width: 500px; }
+.cta-section .btn-primary { font-size: 16px; padding: 16px 38px; }
+
+/* ── FOOTER ── */
+footer { background: var(--navy-dark); padding: 2rem clamp(1.5rem, 6vw, 5rem); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top: 3px solid var(--gold); }
+.footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.footer-links a { color: rgba(255,255,255,0.45); font-size: 12px; text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: var(--gold); }
+.footer-copy { color: rgba(255,255,255,0.25); font-size: 11px; }
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-links.open { display: flex; flex-direction: column; position: fixed; top: 64px; left: 0; right: 0; background: var(--navy-dark); padding: 1rem 1.5rem; gap: 0.75rem; border-bottom: 2px solid var(--gold); z-index: 99; }
+  .nav-menu-toggle { display: block; }
+  .about-grid { grid-template-columns: 1fr; }
+  .prizes-grid { grid-template-columns: 1fr; }
+  .faq-grid { grid-template-columns: 1fr; }
+  .stat-block { min-width: 120px; padding: 1.75rem 1.25rem; }
+  .stat-block .num { font-size: 38px; }
+  .flip-card { height: 240px; }
+  footer { flex-direction: column; text-align: center; }
+  .footer-links { justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .flip-inner, .carousel-track { transition: none !important; }
+  .loader-badge, .loader-sub, .hero-eyebrow, .hero h1, .hero-tagline, .hero-stats, .hero-actions { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-badge">DPL</div>
+  <div class="loader-sub">Data Premier League · 2026</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <span class="nav-badge">DPL</span>
+    <div>
+      <div style="color:white;font-size:13px;font-weight:700;line-height:1.1;">Data Premier League</div>
+      <div class="nav-sub">by INSMA · 2026</div>
+    </div>
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="#about">About</a>
+    <a href="#tracks">Tracks</a>
+    <a href="#prizes">Prizes</a>
+    <a href="#timeline">Timeline</a>
+    <a href="#format">Format</a>
+    <a href="#faq">FAQ</a>
+    <a href="#register" class="nav-cta">Register</a>
+  </div>
+  <button class="nav-menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-orb-1"></div>
+  <div class="hero-orb-2"></div>
+  <div class="hero-orb-3"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Inaugural Edition · July – December 2026</div>
+    <h1>India's First<br><span>Cricket Analytics</span><br>Hackathon</h1>
+    <p class="hero-tagline">Data Premier League challenges analysts, researchers, and cricket minds to build AI-ready solutions using ball-by-ball IPL data — and compete for a ₹3.5 Lakh prize pool.</p>
+    <div class="hero-stats">
+      <div><div class="hero-stat-num">₹3.5L</div><div class="hero-stat-label">Total Prize Pool</div></div>
+      <div><div class="hero-stat-num">5</div><div class="hero-stat-label">Problem Tracks</div></div>
+      <div><div class="hero-stat-num">2</div><div class="hero-stat-label">Categories</div></div>
+      <div><div class="hero-stat-num">Dec '26</div><div class="hero-stat-label">Finals · Bangalore</div></div>
+    </div>
+    <div class="hero-actions">
+      <a href="#register" class="btn-primary">Register Now</a>
+      <a href="#tracks" class="btn-outline">Explore Tracks</a>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-inner">
+    <span>Open for Students & Professionals</span><span>Global Participants Welcome</span><span>Finals at INSMA 2026 Bangalore</span><span>₹3.5 Lakh Prize Pool</span><span>Ball-by-Ball IPL Data</span><span>Hosted on Kaggle</span><span>Registrations Open 20 July 2026</span><span>Open for Students & Professionals</span><span>Global Participants Welcome</span><span>Finals at INSMA 2026 Bangalore</span><span>₹3.5 Lakh Prize Pool</span><span>Ball-by-Ball IPL Data</span><span>Hosted on Kaggle</span><span>Registrations Open 20 July 2026</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about-strip" id="about">
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <div class="section-label">Why DPL in 2026</div>
+      <h2>Where Cricket Meets Data Science</h2>
+      <p>India produces the world's largest volume of cricket data — yet has no dedicated competitive analytics platform. DPL is that platform: an open-access annual competition for data scientists, researchers, sports professionals, and cricket enthusiasts.</p>
+      <p>We're not looking for dashboards or retrospective stats. We want scalable, AI-ready products that coaches, franchise analysts, and broadcasters could use tomorrow — solutions that outthink, not just describe.</p>
+      <p>Top finalists present live at the <strong>Indian Sports Management Conference, Bangalore — December 2026</strong>, judged by analysts, franchise leaders, and academics.</p>
+    </div>
+    <div class="about-callout reveal reveal-delay-2">
+      <div class="about-callout-label">The Inspiration</div>
+      <p>DPL is modelled on the <strong>NFL Big Data Bowl</strong>, which has placed 75+ analysts directly into professional sports roles. We apply the same rigorous, industry-connected philosophy to the IPL ecosystem — and to cricket's unique strategic depth.</p>
+      <div class="inspiration-line">Organised by <strong>INSMA</strong> · Indian Sports Management Association</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS ROW -->
+<div class="stats-row">
+  <div class="stat-block reveal"><div class="num">₹3.5L</div><div class="lbl">Prize Pool</div></div>
+  <div class="stat-block reveal reveal-delay-1"><div class="num">5</div><div class="lbl">Problem Tracks</div></div>
+  <div class="stat-block reveal reveal-delay-2"><div class="num">2</div><div class="lbl">Categories</div></div>
+  <div class="stat-block reveal reveal-delay-3"><div class="num">6</div><div class="lbl">Total Awards</div></div>
+  <div class="stat-block reveal reveal-delay-4"><div class="num">Jul–Dec</div><div class="lbl">2026 Window</div></div>
+</div>
+
+<!-- TRACKS — FLIP CARDS -->
+<section class="tracks-section" id="tracks">
+  <div class="reveal"><div class="section-label">Problem Tracks</div><h2>Five Cricket Analytics Challenges</h2>
+  <p class="section-intro">Each track is a real, unsolved problem at the intersection of data, cricket strategy, and AI. Choose up to three tracks per team. Hover or tap a card to see the key sub-questions.</p></div>
+  <div class="tracks-grid">
+
+    <div class="flip-card reveal reveal-delay-1" tabindex="0" role="button" aria-label="Track 01 — The Value of Surprise. Press to flip for details.">
+      <div class="flip-inner">
+        <div class="flip-front">
+          <span class="track-num" style="background:var(--navy);color:var(--gold);">Track 01</span>
+          <h3>The Value of Surprise</h3>
+          <p class="flip-front-desc">How much is unpredictability worth in T20 cricket? Can surprise be separated from randomness?</p>
+          <div class="flip-hint">Hover / tap for sub-questions ↗</div>
+        </div>
+        <div class="flip-back">
+          <div>
+            <div class="flip-back-label">Key Questions</div>
+            <h3>The Value of Surprise</h3>
+            <ul>
+              <li>Do unpredictable bowlers outperform their raw quality?</li>
+              <li>What is the cost of predictable death bowling?</li>
+              <li>Can surprise be separated from randomness?</li>
+              <li>Are some teams better at disguising intent?</li>
+            </ul>
+          </div>
+          <div class="flip-tap-hint">Tap again to flip back</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-card reveal reveal-delay-2" tabindex="0" role="button" aria-label="Track 02 — True Player Impact. Press to flip for details.">
+      <div class="flip-inner">
+        <div class="flip-front">
+          <span class="track-num">Track 02</span>
+          <h3>True Player Impact</h3>
+          <p class="flip-front-desc">Build a player impact metric that captures hidden value beyond the scorecard — pressure, leverage, behaviour change.</p>
+          <div class="flip-hint">Hover / tap for sub-questions ↗</div>
+        </div>
+        <div class="flip-back">
+          <div>
+            <div class="flip-back-label">Key Questions</div>
+            <h3>True Player Impact</h3>
+            <ul>
+              <li>Which batters add value without scoring boundaries?</li>
+              <li>Which bowlers create pressure without wickets?</li>
+              <li>Who performs above expectation in high-leverage moments?</li>
+              <li>Which players are undervalued by conventional stats?</li>
+            </ul>
+          </div>
+          <div class="flip-tap-hint">Tap again to flip back</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-card reveal reveal-delay-1" tabindex="0" role="button" aria-label="Track 03 — Line-and-Length Game Theory. Press to flip for details.">
+      <div class="flip-inner">
+        <div class="flip-front">
+          <span class="track-num">Track 03</span>
+          <h3>Line-and-Length Game Theory</h3>
+          <p class="flip-front-desc">What is the optimal bowling strategy when the batter is also adapting? Model the minimax problem at cricket's core.</p>
+          <div class="flip-hint">Hover / tap for sub-questions ↗</div>
+        </div>
+        <div class="flip-back">
+          <div>
+            <div class="flip-back-label">Key Questions</div>
+            <h3>Line-and-Length Game Theory</h3>
+            <ul>
+              <li>What mix minimises runs while preserving wicket probability?</li>
+              <li>When should bowlers repeat a plan versus vary it?</li>
+              <li>Can we detect predictable patterns that batters exploit?</li>
+              <li>How should strategy shift after a boundary or wicket?</li>
+            </ul>
+          </div>
+          <div class="flip-tap-hint">Tap again to flip back</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-card reveal reveal-delay-2" tabindex="0" role="button" aria-label="Track 04 — Geometry of Batting. Press to flip for details.">
+      <div class="flip-inner">
+        <div class="flip-front">
+          <span class="track-num">Track 04</span>
+          <h3>Geometry of Batting</h3>
+          <p class="flip-front-desc">Map the spatial value of each ground region for each batter by line, length, bowling type, and match phase.</p>
+          <div class="flip-hint">Hover / tap for sub-questions ↗</div>
+        </div>
+        <div class="flip-back">
+          <div>
+            <div class="flip-back-label">Key Questions</div>
+            <h3>Geometry of Batting</h3>
+            <ul>
+              <li>How does shot-region value shift by bowling type?</li>
+              <li>Which regions are most exploitable in powerplays vs. death?</li>
+              <li>Can we build optimal field settings from spatial data?</li>
+              <li>How do batters adapt their geometry across innings phases?</li>
+            </ul>
+          </div>
+          <div class="flip-tap-hint">Tap again to flip back</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-card reveal reveal-delay-3" tabindex="0" role="button" aria-label="Track 05 — IPL Retention and Release. Press to flip for details.">
+      <div class="flip-inner">
+        <div class="flip-front">
+          <span class="track-num">Track 05</span>
+          <h3>IPL Retention & Release</h3>
+          <p class="flip-front-desc">Build a data-driven framework to decide whether a franchise should retain or release a player before auction.</p>
+          <div class="flip-hint">Hover / tap for sub-questions ↗</div>
+        </div>
+        <div class="flip-back">
+          <div>
+            <div class="flip-back-label">Key Questions</div>
+            <h3>IPL Retention & Release</h3>
+            <ul>
+              <li>Can we separate role value from raw performance?</li>
+              <li>How do age and injury risk factor into retention value?</li>
+              <li>What is a player's likely auction price vs. their actual worth?</li>
+              <li>Which players are most likely to be mispriced at auction?</li>
+            </ul>
+          </div>
+          <div class="flip-tap-hint">Tap again to flip back</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FORMAT -->
+<section class="format-section" id="format">
+  <div class="reveal"><div class="section-label">Competition Format</div><h2>What You Submit</h2>
+  <p class="section-intro">DPL demands real, reproducible, explainable cricket science — not just ideas. Every submission has four mandatory components.</p></div>
+  <div class="format-grid">
+    <div class="format-card reveal reveal-delay-1"><div class="format-icon">📋</div><h3>Project Report</h3><p>4–6 pages covering problem framing, methodology, key findings, limitations, and practical application — readable by technical and cricket audiences alike.</p></div>
+    <div class="format-card reveal reveal-delay-2"><div class="format-icon">💻</div><h3>Code Repository</h3><p>Clean, reproducible code on GitHub with a README, data processing steps, model scripts, and full instructions to reproduce outputs.</p></div>
+    <div class="format-card reveal reveal-delay-3"><div class="format-icon">📊</div><h3>Presentation Deck</h3><p>5–10 slides. Finalists present 5 minutes to an industry audience at the Indian Sports Management Conference, Bangalore.</p></div>
+    <div class="format-card reveal reveal-delay-1"><div class="format-icon">🎮</div><h3>Demo / Visual Output</h3><p>Encouraged: an interactive dashboard, web app, coach-facing report card, or simulation tool that communicates your insight directly.</p></div>
+    <div class="format-card reveal reveal-delay-2"><div class="format-icon">📡</div><h3>Hosted on Kaggle</h3><p>The competition runs on Kaggle (or equivalent), ensuring global reach, verified leaderboard integrity, and accessible data pipelines.</p></div>
+    <div class="format-card reveal reveal-delay-3"><div class="format-icon">🌍</div><h3>Open Globally</h3><p>Individuals and teams may enter. Students in India may participate in both Student and Open categories. All submissions in English.</p></div>
+  </div>
+</section>
+
+<!-- PRIZES -->
+<section class="prizes-section" id="prizes">
+  <div class="reveal"><div class="section-label">Prize Structure</div><h2>₹3.5 Lakh Across Six Awards</h2>
+  <p class="section-intro">Two parallel categories — Student (India) and Open (Global) — each with independent judging and three prizes.</p></div>
+  <div class="prizes-grid">
+    <div class="prize-category reveal reveal-delay-1">
+      <div class="prize-category-label">Student Category · India</div>
+      <div class="prize-row"><div class="prize-rank"><span>🥇</span> First Place</div><div class="prize-amount">₹50,000</div></div>
+      <div class="prize-row"><div class="prize-rank"><span>🥈</span> Second Place</div><div class="prize-amount">₹30,000</div></div>
+      <div class="prize-row"><div class="prize-rank"><span>🥉</span> Third Place</div><div class="prize-amount">₹20,000</div></div>
+      <div class="prize-total"><span>Category Total</span><span>₹1,00,000</span></div>
+    </div>
+    <div class="prize-category reveal reveal-delay-2">
+      <div class="prize-category-label">Open Category · Global</div>
+      <div class="prize-row"><div class="prize-rank"><span>🥇</span> First Place</div><div class="prize-amount">₹1,25,000</div></div>
+      <div class="prize-row"><div class="prize-rank"><span>🥈</span> Second Place</div><div class="prize-amount">₹75,000</div></div>
+      <div class="prize-row"><div class="prize-rank"><span>🥉</span> Third Place</div><div class="prize-amount">₹50,000</div></div>
+      <div class="prize-total"><span>Category Total</span><span>₹2,50,000</span></div>
+    </div>
+  </div>
+  <p style="margin-top:1.5rem;color:rgba(255,255,255,0.35);font-size:13px;" class="reveal">Top 3 finalists from each category present at INSMA 2026, Bangalore. Awards announced on stage before the sports industry.</p>
+</section>
+
+<!-- TIMELINE -->
+<section class="timeline-section" id="timeline">
+  <div class="reveal"><div class="section-label">Schedule</div><h2>Key Dates</h2>
+  <p class="section-intro">The competition runs July through December 2026, culminating at the Indian Sports Management Conference in Bangalore.</p></div>
+  <div class="timeline">
+    <div class="timeline-item reveal reveal-delay-1"><div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div><div><div class="timeline-date">10 July 2026</div><div class="timeline-title">Official Launch</div><div class="timeline-desc">Problem statements finalised; platform confirmed; competition goes live.</div></div></div>
+    <div class="timeline-item reveal reveal-delay-2"><div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div><div><div class="timeline-date">20 July 2026</div><div class="timeline-title">Registrations Open</div><div class="timeline-desc">Challenge brief released; orientation webinar held; team formation begins.</div></div></div>
+    <div class="timeline-item reveal reveal-delay-1"><div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div><div><div class="timeline-date">August – September 2026</div><div class="timeline-title">Active Competition Window</div><div class="timeline-desc">Mentorship sessions, mid-point Q&A, and community engagement with participants.</div></div></div>
+    <div class="timeline-item reveal reveal-delay-2"><div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div><div><div class="timeline-date">15 October 2026</div><div class="timeline-title">Submission Deadline</div><div class="timeline-desc">All submissions close. Judging panel evaluation begins immediately.</div></div></div>
+    <div class="timeline-item reveal reveal-delay-1"><div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div><div><div class="timeline-date">November 2026</div><div class="timeline-title">Finalists Announced</div><div class="timeline-desc">Top 3 per category notified; finalist presentations prepared for the conference.</div></div></div>
+    <div class="timeline-item reveal reveal-delay-2"><div class="timeline-left"><div class="timeline-dot"></div></div><div><div class="timeline-date">December 2026</div><div class="timeline-title">Grand Finale · Bangalore</div><div class="timeline-desc">Finalists present live at the Indian Sports Management Conference. Winners announced and awarded on stage.</div></div></div>
+  </div>
+</section>
+
+<!-- JUDGING -->
+<section id="judging" style="background:var(--off-white);padding:clamp(3rem,6vw,5.5rem) clamp(1.5rem,6vw,5rem);">
+  <div class="reveal"><div class="section-label">Evaluation</div><h2>How Entries Are Judged</h2>
+  <p class="section-intro">A composite score across six parameters, weighted by real-world cricket decision-making importance. The best entry won't be the most complex — it'll be the most right.</p></div>
+  <div class="criteria-grid">
+    <div class="criterion reveal reveal-delay-1"><div class="criterion-header"><h3>Cricket Insight & Problem Framing</h3><span class="criterion-weight">10%</span></div><p>A clear, high-value cricket question with tactical or strategic relevance — and an explanation of why existing metrics fall short.</p></div>
+    <div class="criterion reveal reveal-delay-2"><div class="criterion-header"><h3>Use of Data</h3><span class="criterion-weight">20%</span></div><p>Intelligent use of ball-by-ball, wagon-wheel, and/or line-and-length data. Stronger submissions combine multiple granular sources.</p></div>
+    <div class="criterion reveal reveal-delay-3"><div class="criterion-header"><h3>Analytical Rigour</h3><span class="criterion-weight">20%</span></div><p>Robust, well-validated methodology. Handles uncertainty, sample size, confounding, and model limitations explicitly.</p></div>
+    <div class="criterion reveal reveal-delay-1"><div class="criterion-header"><h3>Originality & Innovation</h3><span class="criterion-weight">20%</span></div><p>A fresh perspective, metric, or model on cricket analytics — something that wouldn't have been obvious from existing literature.</p></div>
+    <div class="criterion reveal reveal-delay-2"><div class="criterion-header"><h3>Practical Application</h3><span class="criterion-weight">20%</span></div><p>Clearly actionable output. A coach, analyst, or auction strategist could use it directly. Specific, context-aware recommendations.</p></div>
+    <div class="criterion reveal reveal-delay-3"><div class="criterion-header"><h3>Communication & Presentation</h3><span class="criterion-weight">10%</span></div><p>Polished, persuasive presentation with strong visuals. Technical methods explained in accessible cricket language.</p></div>
+  </div>
+</section>
+
+<!-- FEES -->
+<section class="fees-section" id="fees">
+  <div class="reveal"><div class="section-label">Entry Fees</div><h2>Registration Pricing</h2>
+  <p class="section-intro">Fees are per problem track. Teams may enter up to three tracks. Contact <a href="mailto:outreach@insma.in" style="color:var(--navy);font-weight:600;">outreach@insma.in</a> for group pricing.</p></div>
+  <table class="fees-table reveal">
+    <thead><tr><th>Participant Type</th><th>Fee Per Track</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Students (India) — Student Category</td><td class="fees-amount">₹2,990</td><td>Undergraduate & postgraduate students enrolled in Indian institutions</td></tr>
+      <tr><td>INSMA Members</td><td class="fees-amount">₹599</td><td>Active INSMA membership required</td></tr>
+      <tr><td>Indian Participants — Open Category</td><td class="fees-amount">₹3,990</td><td>Professionals, researchers, independent analysts</td></tr>
+      <tr><td>Global Participants</td><td class="fees-amount">$199</td><td>Open Category; all nationalities welcome</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- FAQ CAROUSEL -->
+<section class="faq-section" id="faq">
+  <div class="reveal"><div class="section-label">Frequently Asked</div><h2>Questions</h2></div>
+  <div class="carousel-wrap reveal">
+    <div class="carousel-track" id="carouselTrack">
+
+      <div class="faq-slide">
+        <div class="faq-grid">
+          <div class="faq-card"><div class="faq-q">Can I participate as an individual, or do I need a team?</div><div class="faq-a">Both work. You can enter as a solo participant or as a team. Team size limits and composition details will be released with the full challenge brief on 20 July 2026.</div></div>
+          <div class="faq-card"><div class="faq-q">How many tracks can my team enter?</div><div class="faq-a">Each team may submit entries for up to three problem tracks. Entry fees apply per track, so choose the tracks that best match your skills and interests.</div></div>
+          <div class="faq-card"><div class="faq-q">Can Indian students enter the Open Category?</div><div class="faq-a">Yes. Indian students may participate in both the Student Category and the Open Category, but they'll be evaluated against the standard of whichever category they enter. Separate entry fees apply for each.</div></div>
+          <div class="faq-card"><div class="faq-q">What data will participants receive?</div><div class="faq-a">All participants receive access to a ball-by-ball IPL dataset including wagon-wheel (shot location) and line-and-length data. No external datasets are permitted in submissions.</div></div>
+        </div>
+      </div>
+
+      <div class="faq-slide">
+        <div class="faq-grid">
+          <div class="faq-card"><div class="faq-q">Do I need to be in cricket or sports to participate?</div><div class="faq-a">Not at all. DPL is open to data scientists, ML engineers, statisticians, researchers, and analysts from any background. Cricket knowledge helps with problem framing, but analytical rigour is the core of evaluation.</div></div>
+          <div class="faq-card"><div class="faq-q">What analytical methods are acceptable?</div><div class="faq-a">Any appropriate method — regression, classification, Bayesian models, clustering, simulation, causal inference, sequence modelling, explainable AI, or interactive visual analytics. The right method for the cricket question matters more than complexity.</div></div>
+          <div class="faq-card"><div class="faq-q">What happens if my team makes it to the finals?</div><div class="faq-a">Top 3 finalists from each category are invited to present their work live at the Indian Sports Management Conference in Bangalore, December 2026. Travel and logistics details will be communicated to finalists in November.</div></div>
+          <div class="faq-card"><div class="faq-q">When do registrations open and how do I register?</div><div class="faq-a">Registrations open on 20 July 2026. Until then, express your interest or ask questions by emailing outreach@insma.in — you'll be notified as soon as registration goes live.</div></div>
+        </div>
+      </div>
+
+      <div class="faq-slide">
+        <div class="faq-grid">
+          <div class="faq-card"><div class="faq-q">Is there mentorship or support during the competition?</div><div class="faq-a">Yes. The active competition window (August–September) includes mentorship sessions and mid-point Q&A with the DPL team and industry advisors to help participants refine their approaches.</div></div>
+          <div class="faq-card"><div class="faq-q">Are there opportunities beyond the prize money?</div><div class="faq-a">Yes. High-performing participants and finalists gain visibility with IPL franchises, sports analytics firms, and broadcasters who will be present at the Indian Sports Management Conference. Short-to-long-term partnerships with INSMA and its network are available to standout teams.</div></div>
+          <div class="faq-card"><div class="faq-q">What is the submission format and deadline?</div><div class="faq-a">Submissions close on 15 October 2026 and must include a project report, GitHub code repository, presentation deck, and (where applicable) a demo or visual output. Full submission guidelines will be released with the challenge brief.</div></div>
+          <div class="faq-card"><div class="faq-q">How are ties in scoring resolved?</div><div class="faq-a">In case of equal composite scores, the team with a higher score in the higher-weighted parameter(s) takes priority. The judging panel's decision is final.</div></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="carousel-controls">
+      <button class="carousel-btn" id="prevBtn" aria-label="Previous">&#8592;</button>
+      <div class="carousel-dots" id="carouselDots">
+        <button class="carousel-dot active" aria-label="Page 1"></button>
+        <button class="carousel-dot" aria-label="Page 2"></button>
+        <button class="carousel-dot" aria-label="Page 3"></button>
+      </div>
+      <button class="carousel-btn" id="nextBtn" aria-label="Next">&#8594;</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="register">
+  <div class="reveal"><div class="section-label" style="color:var(--navy);">Get Involved</div>
+  <h2>Ready to Change How Cricket Thinks?</h2>
+  <p>Registrations open 20 July 2026. Be part of the inaugural edition — and the beginning of India's cricket analytics movement.</p>
+  <a href="mailto:outreach@insma.in" class="btn-primary">Contact & Register — outreach@insma.in</a>
+  <p style="margin-top:1.5rem;font-size:13px;color:var(--text-muted);">For sponsorship and partnership enquiries, reach out via the same address.</p></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+    <span class="nav-badge">DPL</span>
+    <div><div style="color:white;font-size:12px;font-weight:700;">Data Premier League</div><div class="nav-sub">by INSMA · Inaugural Edition 2026</div></div>
+  </a>
+  <div class="footer-links">
+    <a href="#about">About</a><a href="#tracks">Tracks</a><a href="#prizes">Prizes</a>
+    <a href="#timeline">Timeline</a><a href="#fees">Fees</a><a href="#faq">FAQ</a>
+    <a href="mailto:outreach@insma.in">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 INSMA · Indian Sports Management Association</div>
+</footer>
+
+<script>
+// ── LOADER ──
+window.addEventListener('load', () => {
+  setTimeout(() => { document.getElementById('loader').classList.add('hidden'); }, 1400);
+});
+
+// ── NAV TOGGLE ──
+document.getElementById('menuToggle').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+document.querySelectorAll('.nav-links a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+});
+
+// ── SCROLL REVEAL ──
+const revealEls = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+revealEls.forEach(el => revealObs.observe(el));
+
+// ── FLIP CARDS (keyboard) ──
+document.querySelectorAll('.flip-card').forEach(card => {
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.classList.toggle('flipped'); }
+  });
+  card.addEventListener('click', () => { card.classList.toggle('flipped'); });
+});
+
+// ── CAROUSEL ──
+const track = document.getElementById('carouselTrack');
+const dots = document.querySelectorAll('.carousel-dot');
+let current = 0;
+const total = 3;
+
+function goTo(idx) {
+  current = (idx + total) % total;
+  track.style.transform = `translateX(-${current * 100}%)`;
+  dots.forEach((d, i) => d.classList.toggle('active', i === current));
+}
+
+document.getElementById('prevBtn').addEventListener('click', () => goTo(current - 1));
+document.getElementById('nextBtn').addEventListener('click', () => goTo(current + 1));
+dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+
+// Auto-advance carousel
+let autoInterval = setInterval(() => goTo(current + 1), 6000);
+track.parentElement.addEventListener('mouseenter', () => clearInterval(autoInterval));
+track.parentElement.addEventListener('mouseleave', () => { autoInterval = setInterval(() => goTo(current + 1), 6000); });
+
+// Touch swipe support
+let touchStartX = 0;
+track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+track.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) goTo(diff > 0 ? current + 1 : current - 1);
+});
+</script>
+</body>
+</html>
